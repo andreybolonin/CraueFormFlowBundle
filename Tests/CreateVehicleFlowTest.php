@@ -3,7 +3,6 @@
 namespace Craue\FormFlowBundle\Tests;
 
 use Craue\FormFlowBundle\Tests\IntegrationTestCase;
-use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * @group integration
@@ -214,22 +213,10 @@ class CreateVehicleFlowTest extends IntegrationTestCase {
 
 		// invalid number of wheels -> step 1 again
 		$form = $crawler->selectButton('next')->form();
-		if (Kernel::VERSION_ID >= 20400) {
-			$form->disableValidation();
-			$crawler = $this->client->submit($form, array(
-				'createVehicle[numberOfWheels]' => 99,
-			));
-		} else {
-			// impossible to send invalid values with DomCrawler, see https://github.com/symfony/symfony/issues/7672
-			// TODO remove as soon as Symfony >= 2.4 is required
-			$crawler = $this->client->request($form->getMethod(), $form->getUri(), array(
-				'flow_createVehicle_instance' => $form->get('flow_createVehicle_instance')->getValue(),
-				'flow_createVehicle_step' => 1,
-				'createVehicle' => array(
-					'numberOfWheels' => 99,
-				),
-			));
-		}
+		$form->disableValidation();
+		$crawler = $this->client->submit($form, array(
+			'createVehicle[numberOfWheels]' => 99,
+		));
 		$this->assertCurrentStepNumber(1, $crawler);
 		$this->assertContainsFormError('This value is not valid.', $crawler);
 
@@ -242,22 +229,10 @@ class CreateVehicleFlowTest extends IntegrationTestCase {
 
 		// invalid engine -> step 2 again
 		$form = $crawler->selectButton('next')->form();
-		if (Kernel::VERSION_ID >= 20400) {
-			$form->disableValidation();
-			$crawler = $this->client->submit($form, array(
-				'createVehicle[engine]' => 'magic',
-			));
-		} else {
-			// impossible to send invalid values with DomCrawler, see https://github.com/symfony/symfony/issues/7672
-			// TODO remove as soon as Symfony >= 2.4 is required
-			$crawler = $this->client->request($form->getMethod(), $form->getUri(), array(
-				'flow_createVehicle_instance' => $form->get('flow_createVehicle_instance')->getValue(),
-				'flow_createVehicle_step' => 2,
-				'createVehicle' => array(
-					'engine' => 'magic',
-				),
-			));
-		}
+		$form->disableValidation();
+		$crawler = $this->client->submit($form, array(
+			'createVehicle[engine]' => 'magic',
+		));
 		$this->assertCurrentStepNumber(2, $crawler);
 		$this->assertContainsFormError('This value is not valid.', $crawler);
 	}
